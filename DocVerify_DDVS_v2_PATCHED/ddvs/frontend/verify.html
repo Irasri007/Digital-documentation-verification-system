@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DocVerify – Scan Result</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --teal: #2ec4b6; --teal-dark: #1a9e92; --teal-light: #e0f7f5;
+    --purple: #7c3aed; --navy: #0f172a; --slate: #334155;
+    --muted: #64748b; --border: #e2e8f0; --bg: #f8fafc;
+    --green: #10b981; --red: #ef4444; --amber: #f59e0b;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--navy);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  /* Background gradient */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: -1;
+    background:
+      radial-gradient(ellipse 80% 60% at 80% 10%, rgba(46,196,182,.1) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 20% 80%, rgba(124,58,237,.07) 0%, transparent 60%);
+  }
+
+  /* Card */
+  .card {
+    background: white;
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 60px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+    width: 100%;
+    max-width: 520px;
+    overflow: hidden;
+  }
+
+  /* Header */
+  .card-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #134e4a 100%);
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .logo-icon {
+    width: 40px; height: 40px;
+    background: var(--teal);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 20px rgba(46,196,182,.4);
+    flex-shrink: 0;
+  }
+  .logo-icon svg { width: 22px; height: 22px; stroke: white; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .header-text { color: white; }
+  .header-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.1rem; }
+  .header-title span { color: var(--teal); }
+  .header-sub { font-size: .78rem; color: rgba(255,255,255,.5); margin-top: 2px; }
+
+  /* Body */
+  .card-body { padding: 32px; }
+
+  /* Loading state */
+  .loading-wrap {
+    text-align: center;
+    padding: 20px 0;
+  }
+  .spinner-large {
+    width: 52px; height: 52px;
+    border: 4px solid var(--teal-light);
+    border-top-color: var(--teal);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+    margin: 0 auto 20px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.1rem; margin-bottom: 6px; }
+  .loading-sub { color: var(--muted); font-size: .88rem; }
+
+  /* Status banner */
+  .status-banner {
+    display: flex; align-items: center; gap: 16px;
+    padding: 20px 22px; border-radius: 14px; margin-bottom: 24px;
+  }
+  .status-verified { background: #d1fae5; }
+  .status-tampered { background: #fee2e2; }
+  .status-invalid  { background: #fef3c7; }
+  .status-icon {
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .status-icon svg { width: 24px; height: 24px; stroke: white; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  .status-title { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1.1rem; }
+  .status-sub { font-size: .83rem; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+
+  /* Details grid */
+  .details-grid {
+    display: flex; flex-direction: column; gap: 10px;
+    margin-bottom: 24px;
+  }
+  .detail-row {
+    display: flex; align-items: flex-start;
+    background: var(--bg); border-radius: 10px;
+    padding: 12px 16px; gap: 12px;
+  }
+  .detail-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: .9rem;
+  }
+  .detail-label { font-size: .72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .detail-value { font-size: .88rem; font-weight: 500; color: var(--navy); margin-top: 2px; word-break: break-all; }
+
+  /* Check pills */
+  .checks-row {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 24px;
+  }
+  .check-pill {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 20px;
+    font-size: .78rem; font-weight: 600;
+  }
+  .pill-green { background: #d1fae5; color: #065f46; }
+  .pill-red   { background: #fee2e2; color: #991b1b; }
+  .pill-amber { background: #fef3c7; color: #92400e; }
+  .check-pill .dot { width: 7px; height: 7px; border-radius: 50%; }
+  .dot-g { background: var(--green); }
+  .dot-r { background: var(--red); }
+  .dot-a { background: var(--amber); }
+
+  /* Crypto block */
+  .crypto-block {
+    background: var(--navy); border-radius: 12px;
+    padding: 18px 20px; margin-bottom: 24px;
+  }
+  .crypto-label {
+    font-size: .68rem; font-weight: 700; color: rgba(255,255,255,.35);
+    text-transform: uppercase; letter-spacing: .1em; margin-bottom: 10px;
+  }
+  .crypto-pre {
+    font-family: monospace; font-size: .72rem; color: #7dd3fc;
+    line-height: 1.9; white-space: pre-wrap; word-break: break-all;
+  }
+
+  /* Footer link */
+  .back-link {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--teal); color: white; border-radius: 12px;
+    padding: 14px; font-family: 'Sora', sans-serif; font-weight: 700;
+    font-size: .95rem; text-decoration: none;
+    box-shadow: 0 4px 14px rgba(46,196,182,.35);
+    transition: all .2s;
+  }
+  .back-link:hover { background: var(--teal-dark); transform: translateY(-2px); }
+
+  /* Timestamp */
+  .timestamp {
+    text-align: center; font-size: .75rem; color: var(--muted);
+    margin-top: 20px;
+  }
+
+  /* Error state */
+  .error-wrap { text-align: center; padding: 12px 0; }
+  .error-icon { font-size: 3rem; margin-bottom: 16px; }
+  .error-title { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: 8px; }
+  .error-sub { color: var(--muted); font-size: .9rem; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <!-- Header -->
+  <div class="card-header">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+    </div>
+    <div class="header-text">
+      <div class="header-title">Doc<span>Verify</span></div>
+      <div class="header-sub">QR Scan Verification · Graphic Era University</div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="card-body" id="cardBody">
+    <!-- Loading -->
+    <div class="loading-wrap" id="loadingState">
+      <div class="spinner-large"></div>
+      <div class="loading-title">Verifying Document...</div>
+      <div class="loading-sub" id="loadingCredId">Checking credential registry</div>
+    </div>
+  </div>
+</div>
+
+<div class="timestamp" id="timestamp"></div>
+
+<script>
+const API_BASE = 'http://localhost:8080/api';
+
+// Get credential ID from URL ?id=CRED-XXX
+function getCredentialId() {
+  const params = new URLSearchParams(window.location.search);
+  return (params.get('id') || params.get('credentialId') || '').trim().toUpperCase();
+}
+
+async function verify() {
+  const credId = getCredentialId();
+  const body   = document.getElementById('cardBody');
+
+  if (!credId) {
+    showError('No Credential ID', 'This QR code does not contain a valid Credential ID. Please scan a valid DocVerify QR code.');
+    return;
+  }
+
+  document.getElementById('loadingCredId').textContent = credId;
+
+  try {
+    const res  = await fetch(`${API_BASE}/verify`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ mode: 'credential', credentialId: credId })
+    });
+
+    if (!res.ok) throw new Error(`Server returned HTTP ${res.status}`);
+    const data = await res.json();
+    renderResult(data, credId);
+
+  } catch(e) {
+    // Backend might not be reachable from mobile — show friendly message
+    if (e.message.includes('fetch') || e.message.includes('network') || e.message.includes('Failed')) {
+      showError(
+        'Cannot Reach Verification Server',
+        'The DocVerify server at localhost:8080 is not reachable from this device. ' +
+        'The QR code is for local network use only. ' +
+        'Credential ID: ' + credId
+      );
+    } else {
+      showError('Verification Error', e.message + '\n\nCredential ID: ' + credId);
+    }
+  }
+}
+
+function renderResult(data, credId) {
+  const body = document.getElementById('cardBody');
+  document.getElementById('timestamp').textContent =
+    'Verified at ' + new Date().toLocaleString();
+
+  const cfg = {
+    verified:   { cls:'status-verified',  bg:'#10b981', svg:'<path d="M5 13l4 4L19 7"/>',       title:'✓ Document Verified',      sub:'SHA-256 hash matches the registry. Digital signature is valid. This document is authentic and unmodified.' },
+    tampered:   { cls:'status-tampered',  bg:'#ef4444', svg:'<path d="M6 18L18 6M6 6l12 12"/>', title:'✗ Tampering Detected',      sub:'The document hash does not match the stored record. This document may have been altered or corrupted.' },
+    invalid:    { cls:'status-invalid',   bg:'#f59e0b', svg:'<path d="M12 9v4m0 4h.01"/>',      title:'⚠ Credential Not Found',    sub:'This Credential ID does not exist in the DocVerify registry. It may be invalid or not yet issued.' },
+    not_issued: { cls:'status-invalid',   bg:'#f59e0b', svg:'<path d="M12 9v4m0 4h.01"/>',      title:'⚠ Not Registered',          sub:'This document has not been issued through DocVerify.' }
+  };
+
+  const c = cfg[data.status] || {
+    cls:'status-invalid', bg:'#64748b',
+    svg:'<path d="M12 9v4m0 4h.01"/>',
+    title:'Unknown Status',
+    sub:'Server returned: ' + (data.status || 'none')
+  };
+
+  const checks = [
+    { label:'Hash Match',    pass: data.hashMatch,       passText:'✓ Match',   failText:'✗ Mismatch' },
+    { label:'Signature',     pass: data.signatureValid,  passText:'✓ Valid',   failText:'✗ Invalid'  },
+    { label:'In Registry',   pass: data.credentialFound, passText:'✓ Found',   failText:'✗ Not found'},
+    { label:'Issuer Trusted',pass: data.issuerTrusted,   passText:'✓ Trusted', failText:'✗ Unknown'  },
+  ];
+
+  const fmt = (s, n=24) => s ? s.substring(0,n)+'…' : 'N/A';
+
+  body.innerHTML = `
+    <!-- Status banner -->
+    <div class="status-banner ${c.cls}">
+      <div class="status-icon" style="background:${c.bg};">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">${c.svg}</svg>
+      </div>
+      <div>
+        <div class="status-title">${c.title}</div>
+        <div class="status-sub">${c.sub}</div>
+      </div>
+    </div>
+
+    <!-- Document details -->
+    <div class="details-grid">
+      <div class="detail-row">
+        <div class="detail-icon" style="background:#e0f7f5;">📄</div>
+        <div>
+          <div class="detail-label">Document</div>
+          <div class="detail-value">${data.fileName || 'Unknown'}</div>
+        </div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-icon" style="background:#ede9fe;">🔑</div>
+        <div>
+          <div class="detail-label">Credential ID</div>
+          <div class="detail-value">${data.credentialId || credId}</div>
+        </div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-icon" style="background:#e0f7f5;">🏛️</div>
+        <div>
+          <div class="detail-label">Issued By</div>
+          <div class="detail-value">${data.issuer || 'Unknown'}</div>
+        </div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-icon" style="background:#fef3c7;">🕒</div>
+        <div>
+          <div class="detail-label">Issued At</div>
+          <div class="detail-value">${data.issuedAt ? new Date(data.issuedAt).toLocaleString() : 'N/A'}</div>
+        </div>
+      </div>
+      ${data.fileSize ? `
+      <div class="detail-row">
+        <div class="detail-icon" style="background:#f1f5f9;">💾</div>
+        <div>
+          <div class="detail-label">File Size</div>
+          <div class="detail-value">${(data.fileSize/1024).toFixed(1)} KB</div>
+        </div>
+      </div>` : ''}
+    </div>
+
+    <!-- Check pills -->
+    <div class="checks-row">
+      ${checks.map(ch => `
+        <div class="check-pill ${ch.pass ? 'pill-green' : 'pill-red'}">
+          <div class="dot ${ch.pass ? 'dot-g' : 'dot-r'}"></div>
+          ${ch.label}: ${ch.pass ? ch.passText : ch.failText}
+        </div>`).join('')}
+    </div>
+
+    <!-- Crypto block -->
+    <div class="crypto-block">
+      <div class="crypto-label">Cryptographic Details</div>
+      <pre class="crypto-pre">Algorithm:   SHA-256 + HMAC-SHA256
+Credential:  ${data.credentialId || credId}
+Hash:        ${fmt(data.storedHash || data.hash)}
+Signature:   ${fmt(data.signature)}
+Hash Match:  ${data.hashMatch ? '✓ VERIFIED' : '✗ MISMATCH'}
+Sig Valid:   ${data.signatureValid ? '✓ VALID' : '✗ INVALID'}
+Checked At:  ${new Date().toISOString()}</pre>
+    </div>
+
+    <!-- Back button -->
+    <a href="index.html" class="back-link">
+      ← Open DocVerify Dashboard
+    </a>
+  `;
+}
+
+function showError(title, message) {
+  document.getElementById('cardBody').innerHTML = `
+    <div class="error-wrap">
+      <div class="error-icon">⚠️</div>
+      <div class="error-title">${title}</div>
+      <div class="error-sub" style="white-space:pre-wrap;">${message}</div>
+      <a href="index.html" class="back-link" style="margin-top:24px;display:flex;">
+        ← Open DocVerify Dashboard
+      </a>
+    </div>
+  `;
+  document.getElementById('timestamp').textContent = new Date().toLocaleString();
+}
+
+// Run on load
+window.addEventListener('DOMContentLoaded', verify);
+</script>
+</body>
+</html>

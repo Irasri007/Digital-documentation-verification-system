@@ -1,0 +1,142 @@
+{
+  "documents": [
+    {
+      "credentialId": "CRED-GEU-2026-AA1234XX",
+      "hash": "eddb428029bcfc37d182734fcbce78972cbf7e505216269fdccd5d21d42b963e",
+      "signature": "c4e9bdb187fb31c29e3223e1981dd811c72f5d02b528f45d3efc9753d46eabb7",
+      "fileName": "aadhaar_card_suhani.pdf",
+      "fileSize": 102400,
+      "fileType": "application/pdf",
+      "issuedAt": "2026-01-15T09:30:00.000Z",
+      "issuer": "Government of India (UIDAI)"
+    },
+    {
+      "credentialId": "CRED-GEU-2026-PAN567YZ",
+      "hash": "855050441a60dbaf896ae95ba2f97b23706364f944111cd2d656411d43f5824d",
+      "signature": "937227f630390bb779c26eefe98f0761fb6ac283d1a29e3b2fc582b2325340a2",
+      "fileName": "pan_card_avni.pdf",
+      "fileSize": 87040,
+      "fileType": "application/pdf",
+      "issuedAt": "2026-01-20T10:00:00.000Z",
+      "issuer": "Income Tax Department, Government of India"
+    },
+    {
+      "credentialId": "CRED-GEU-2026-MK890AB",
+      "hash": "e8a167f4261ff953f9b0a1df49763787044c12a45956a5c51fd8ec837d918928",
+      "signature": "97ce092cdae744c26a69b230d2efe6ef10eab95614b002e61b850979b26d1cdb",
+      "fileName": "marksheet_class12_ira.pdf",
+      "fileSize": 204800,
+      "fileType": "application/pdf",
+      "issuedAt": "2026-02-01T11:00:00.000Z",
+      "issuer": "CBSE / State Board (Senior Secondary Education)"
+    },
+    {
+      "credentialId": "CRED-GEU-2026-GEU234CD",
+      "hash": "fac2ed47075b7b0f206e460c82c1877e9095d2da4f0b177f65c009a5f0defb20",
+      "signature": "739ccc6586649d1199f94a5ac6b14b8b363c4549bb23e822c0688c231ef1b01b",
+      "fileName": "geu_degree_certificate_suhani.pdf",
+      "fileSize": 307200,
+      "fileType": "application/pdf",
+      "issuedAt": "2026-02-15T12:00:00.000Z",
+      "issuer": "Graphic Era University"
+    },
+    {
+      "credentialId": "CRED-GEU-2026-INT678EF",
+      "hash": "ae7948c17ebdbdb2340515fb33977bfe3bb4cf4d17313619224dc1272ff75003",
+      "signature": "f7f908e8f8c06cb49be08991ebea98ebddea566cce3410b52e51d76205b36f2a",
+      "fileName": "internship_certificate_avni.pdf",
+      "fileSize": 153600,
+      "fileType": "application/pdf",
+      "issuedAt": "2026-02-20T14:00:00.000Z",
+      "issuer": "Internship Issuing Organisation"
+    },
+    {
+      "credentialId": "CRED-GEU-2026-VOT901GH",
+      "hash": "ff9059b0608fb302cef8e690086034fdb6da6c822c3dcfdf20e18c453aa816bd",
+      "signature": "66076a4136fca04fa99b9c2833ea9a31975fa16776ad094b921308f8e6d7157b",
+      "fileName": "voter_id_ira.pdf",
+      "fileSize": 92160,
+      "fileType": "application/pdf",
+      "issuedAt": "2026-03-01T09:00:00.000Z",
+      "issuer": "Election Commission of India"
+    },
+    {
+      "credentialId": "CRED-GEU-2026-PSP112IJ",
+      "hash": "be96c15b8e2075414c13c36900e7c251ffd34fb4d0c8af78c1053dd58e7baaba",
+      "signature": "88976810462917ea3385def271a6f4c7ebe0a1a2b59a1767d1a33649906c6780",
+      "fileName": "passport_suhani.pdf",
+      "fileSize": 204800,
+      "fileType": "application/pdf",
+      "issuedAt": "2026-03-05T10:30:00.000Z",
+      "issuer": "Ministry of External Affairs, Government of India"
+    },
+    {
+      "credentialId": "CRED-GEU-2026-SEM345KL",
+      "hash": "62b61c016b52165eb7371bf9d67e18e989f5ba11c3293fe8e08ac3e9f2eadd30",
+      "signature": "5486d7dfd9e6d419da0009daa294c7ed83df6add7b43627b0b5b8f7e6aff6e41",
+      "fileName": "marksheet_semester4_geu.pdf",
+      "fileSize": 184320,
+      "fileType": "application/pdf",
+      "issuedAt": "2026-03-10T11:00:00.000Z",
+      "issuer": "Graphic Era University"
+    }
+  ],
+  "auditLog": [
+    {
+      "action": "ISSUE",
+      "credentialId": "CRED-GEU-2026-AA1234XX",
+      "fileName": "aadhaar_card_suhani.pdf",
+      "result": "SUCCESS",
+      "at": "2026-01-15T09:30:00.000Z"
+    },
+    {
+      "action": "ISSUE",
+      "credentialId": "CRED-GEU-2026-PAN567YZ",
+      "fileName": "pan_card_avni.pdf",
+      "result": "SUCCESS",
+      "at": "2026-01-20T10:00:00.000Z"
+    },
+    {
+      "action": "ISSUE",
+      "credentialId": "CRED-GEU-2026-MK890AB",
+      "fileName": "marksheet_class12_ira.pdf",
+      "result": "SUCCESS",
+      "at": "2026-02-01T11:00:00.000Z"
+    },
+    {
+      "action": "ISSUE",
+      "credentialId": "CRED-GEU-2026-GEU234CD",
+      "fileName": "geu_degree_certificate_suhani.pdf",
+      "result": "SUCCESS",
+      "at": "2026-02-15T12:00:00.000Z"
+    },
+    {
+      "action": "ISSUE",
+      "credentialId": "CRED-GEU-2026-INT678EF",
+      "fileName": "internship_certificate_avni.pdf",
+      "result": "SUCCESS",
+      "at": "2026-02-20T14:00:00.000Z"
+    },
+    {
+      "action": "ISSUE",
+      "credentialId": "CRED-GEU-2026-VOT901GH",
+      "fileName": "voter_id_ira.pdf",
+      "result": "SUCCESS",
+      "at": "2026-03-01T09:00:00.000Z"
+    },
+    {
+      "action": "ISSUE",
+      "credentialId": "CRED-GEU-2026-PSP112IJ",
+      "fileName": "passport_suhani.pdf",
+      "result": "SUCCESS",
+      "at": "2026-03-05T10:30:00.000Z"
+    },
+    {
+      "action": "ISSUE",
+      "credentialId": "CRED-GEU-2026-SEM345KL",
+      "fileName": "marksheet_semester4_geu.pdf",
+      "result": "SUCCESS",
+      "at": "2026-03-10T11:00:00.000Z"
+    }
+  ]
+}

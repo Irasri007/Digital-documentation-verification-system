@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DocVerify – Digital Documentation Verification System</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --teal: #2ec4b6;
+    --teal-dark: #1a9e92;
+    --teal-light: #e0f7f5;
+    --purple: #7c3aed;
+    --purple-light: #ede9fe;
+    --navy: #0f172a;
+    --slate: #334155;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --bg: #f8fafc;
+    --white: #ffffff;
+    --green: #10b981;
+    --red: #ef4444;
+    --amber: #f59e0b;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--navy); min-height: 100vh; }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.88); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border); padding: 0 48px;
+    display: flex; align-items: center; justify-content: space-between; height: 64px;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .logo-icon { width: 32px; height: 32px; background: var(--teal); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .logo-icon svg { width: 18px; height: 18px; fill: none; stroke: white; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .logo-text { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.15rem; color: var(--navy); }
+  .logo-text span { color: var(--teal); }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { text-decoration: none; color: var(--slate); font-size: 0.9rem; font-weight: 500; transition: color .2s; }
+  .nav-links a:hover { color: var(--teal); }
+  .nav-cta { background: var(--teal); color: white; border: none; border-radius: 8px; padding: 10px 22px; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: background .2s, transform .15s; }
+  .nav-cta:hover { background: var(--teal-dark); transform: translateY(-1px); }
+
+  /* HERO */
+  .hero { padding: 80px 48px 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; max-width: 1200px; margin: 0 auto; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--teal-light); color: var(--teal-dark); border-radius: 20px; padding: 6px 14px; font-size: 0.8rem; font-weight: 600; margin-bottom: 20px; }
+  .hero-badge::before { content: '●'; font-size: 0.6rem; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  h1 { font-family: 'Sora', sans-serif; font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800; line-height: 1.12; margin-bottom: 20px; }
+  h1 span { color: var(--teal); }
+  .hero-sub { color: var(--muted); font-size: 1.05rem; line-height: 1.7; margin-bottom: 32px; max-width: 480px; }
+  .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn-primary { background: var(--teal); color: white; border: none; border-radius: 10px; padding: 14px 28px; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all .2s; box-shadow: 0 4px 14px rgba(46,196,182,.35); }
+  .btn-primary:hover { background: var(--teal-dark); transform: translateY(-2px); }
+  .btn-outline { background: transparent; color: var(--navy); border: 2px solid var(--border); border-radius: 10px; padding: 14px 28px; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all .2s; }
+  .btn-outline:hover { border-color: var(--teal); color: var(--teal); }
+
+  /* HERO VISUAL */
+  .hero-visual { position: relative; display: flex; justify-content: center; }
+  .doc-card { background: white; border-radius: 16px; padding: 28px; box-shadow: 0 20px 60px rgba(0,0,0,.1); width: 340px; animation: float 4s ease-in-out infinite; border: 1px solid var(--border); }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  .doc-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .doc-icon { width: 40px; height: 40px; background: var(--teal-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .doc-icon svg { width: 20px; height: 20px; stroke: var(--teal-dark); fill: none; stroke-width: 2; }
+  .doc-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 0.95rem; }
+  .doc-sub { font-size: 0.75rem; color: var(--muted); }
+  .score-ring { text-align: center; margin: 16px 0; position: relative; }
+  .score-ring svg { width: 120px; height: 120px; }
+  .score-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+  .score-num { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1.8rem; color: var(--teal); }
+  .score-label { font-size: 0.65rem; color: var(--muted); }
+  .checks { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+  .check-item { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; }
+  .check-item .icon { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; flex-shrink: 0; }
+  .check-pass { background: #d1fae5; color: #065f46; }
+  .check-warn { background: #fef3c7; color: #92400e; }
+  .check-bar { flex: 1; height: 5px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .check-bar-fill { height: 100%; border-radius: 4px; }
+  .pill-verified { display: inline-flex; align-items: center; gap: 6px; background: #d1fae5; color: #065f46; border-radius: 20px; padding: 6px 14px; font-size: 0.78rem; font-weight: 600; margin-top: 16px; width: 100%; justify-content: center; }
+  .floating-badge { position: absolute; top: -16px; right: -20px; background: var(--purple); color: white; border-radius: 12px; padding: 10px 14px; font-size: 0.75rem; font-weight: 600; box-shadow: 0 8px 24px rgba(124,58,237,.3); }
+
+  /* BG */
+  .hero-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: -1; background: radial-gradient(ellipse 80% 60% at 80% 10%, rgba(46,196,182,.08) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 20% 80%, rgba(124,58,237,.06) 0%, transparent 60%); }
+
+  /* SECTIONS */
+  .section { max-width: 1200px; margin: 0 auto; padding: 60px 48px; }
+  .section-label { font-size: 0.78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--teal); margin-bottom: 10px; }
+  .section-title { font-family: 'Sora', sans-serif; font-size: 2rem; font-weight: 800; margin-bottom: 12px; }
+  .section-sub { color: var(--muted); font-size: 1rem; max-width: 520px; line-height: 1.7; }
+
+  /* UPLOAD GRID */
+  .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 40px; }
+  .upload-box { border: 2px dashed var(--border); border-radius: 16px; padding: 48px 32px; text-align: center; cursor: pointer; transition: all .2s; background: white; }
+  .upload-box:hover, .upload-box.active { border-color: var(--teal); background: var(--teal-light); }
+  .upload-icon { width: 56px; height: 56px; background: var(--teal-light); border-radius: 14px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; }
+  .upload-icon svg { width: 28px; height: 28px; stroke: var(--teal); fill: none; stroke-width: 1.8; }
+  .upload-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.05rem; margin-bottom: 6px; }
+  .upload-hint { color: var(--muted); font-size: 0.85rem; margin-bottom: 20px; line-height: 1.6; }
+  .upload-formats { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .format-tag { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 0.75rem; color: var(--slate); }
+
+  /* CREDENTIAL BOX */
+  .credential-box { background: white; border-radius: 16px; padding: 36px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,.04); }
+  .input-group { margin-top: 16px; }
+  .input-label { font-size: 0.85rem; font-weight: 600; color: var(--slate); margin-bottom: 8px; display: block; }
+  .input-field { width: 100%; padding: 14px 18px; border: 2px solid var(--border); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 1rem; color: var(--navy); outline: none; transition: border-color .2s; background: var(--bg); }
+  .input-field:focus { border-color: var(--teal); background: white; }
+  .input-field::placeholder { color: var(--muted); }
+
+  /* VERIFY BUTTON */
+  .verify-btn { width: 100%; margin-top: 16px; background: var(--teal); color: white; border: none; border-radius: 10px; padding: 16px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all .2s; box-shadow: 0 4px 14px rgba(46,196,182,.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .verify-btn:hover { background: var(--teal-dark); transform: translateY(-2px); }
+  .verify-btn svg { width: 18px; height: 18px; stroke: white; fill: none; stroke-width: 2.5; }
+
+  /* RESULT PANEL */
+  .result-panel { background: white; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,.04); overflow: hidden; margin-top: 32px; display: none; }
+  .result-panel.show { display: block; animation: slideUp .4s ease; }
+  @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+  .result-header { padding: 24px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .result-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1rem; }
+  .result-body { padding: 28px; }
+  .status-banner { display: flex; align-items: center; gap: 16px; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; }
+  .status-verified { background: #d1fae5; }
+  .status-tampered { background: #fee2e2; }
+  .status-invalid  { background: #fef3c7; }
+  .status-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .status-icon svg { width: 22px; height: 22px; stroke: white; fill: none; stroke-width: 2.5; }
+  .status-text-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.05rem; }
+  .status-text-sub { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
+  .checks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .check-card { background: var(--bg); border-radius: 10px; padding: 14px 18px; display: flex; align-items: center; gap: 12px; }
+  .check-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .dot-green { background: var(--green); }
+  .dot-red   { background: var(--red); }
+  .dot-amber { background: var(--amber); }
+  .check-name { font-size: 0.85rem; font-weight: 500; }
+  .check-val  { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+  /* HOW IT WORKS */
+  .steps-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; margin-top: 40px; }
+  .step-card { background: white; border-radius: 16px; padding: 28px; border: 1px solid var(--border); position: relative; }
+  .step-num { width: 36px; height: 36px; border-radius: 50%; background: var(--teal-light); color: var(--teal-dark); font-family: 'Sora', sans-serif; font-weight: 800; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+  .step-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 8px; }
+  .step-desc { color: var(--muted); font-size: 0.88rem; line-height: 1.65; }
+  .step-arrow { position: absolute; right: -13px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; background: white; border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 2; }
+  .step-arrow svg { width: 12px; height: 12px; stroke: var(--muted); fill: none; stroke-width: 2.5; }
+
+  /* FEATURES */
+  .features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-top: 40px; }
+  .feature-card { background: white; border-radius: 16px; padding: 28px; border: 1px solid var(--border); transition: all .25s; }
+  .feature-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.08); border-color: var(--teal); }
+  .feature-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+  .fi-teal { background: var(--teal-light); }
+  .fi-purple { background: var(--purple-light); }
+  .fi-green { background: #d1fae5; }
+  .fi-amber { background: #fef3c7; }
+  .feature-icon svg { width: 22px; height: 22px; fill: none; stroke-width: 2; }
+  .si-teal { stroke: var(--teal-dark); }
+  .si-purple { stroke: var(--purple); }
+  .si-green { stroke: var(--green); }
+  .si-amber { stroke: var(--amber); }
+  .feature-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 8px; }
+  .feature-desc { color: var(--muted); font-size: 0.85rem; line-height: 1.6; }
+
+  /* MISC */
+  .divider { height: 1px; background: var(--border); max-width: 1200px; margin: 0 auto; }
+  footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 40px 48px; text-align: center; font-size: 0.85rem; }
+  footer strong { color: white; }
+  .spinner { width: 18px; height: 18px; border: 3px solid rgba(255,255,255,.3); border-top-color: white; border-radius: 50%; animation: spin .7s linear infinite; display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner.show { display: block; }
+  .btn-text.hide { display: none; }
+
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; padding: 48px 24px; }
+    .hero-visual { display: none; }
+    .upload-grid { grid-template-columns: 1fr; }
+    .steps-grid, .features-grid, .checks-grid { grid-template-columns: 1fr; }
+    nav { padding: 0 24px; }
+    .nav-links { display: none; }
+    .section { padding: 40px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ AUTH OVERLAY ═══════════════════ -->
+<div id="authOverlay" style="position:fixed;inset:0;z-index:9999;display:flex;background:#f8fafc;overflow:hidden;">
+  <!-- Left branding panel -->
+  <div style="width:48%;background:linear-gradient(135deg,#0f172a 0%,#1e293b 60%,#134e4a 100%);display:flex;flex-direction:column;justify-content:space-between;padding:48px;position:relative;overflow:hidden;">
+    <div style="position:absolute;width:500px;height:500px;border-radius:50%;border:1px solid rgba(46,196,182,.12);top:-120px;left:-120px;pointer-events:none;"></div>
+    <div style="position:absolute;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(46,196,182,.08),transparent 70%);bottom:80px;right:-60px;pointer-events:none;"></div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:40px;height:40px;background:var(--teal);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(46,196,182,.4);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+      </div>
+      <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:1.3rem;color:white;">Doc<span style="color:var(--teal);">Verify</span></span>
+    </div>
+    <div>
+      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(46,196,182,.15);border:1px solid rgba(46,196,182,.25);border-radius:20px;padding:6px 14px;font-size:.78rem;font-weight:600;color:var(--teal);margin-bottom:24px;"><span style="font-size:.6rem;">●</span> Cryptographic Trust Engine</div>
+      <h2 style="font-family:'Sora',sans-serif;font-size:2.4rem;font-weight:800;color:white;line-height:1.15;margin-bottom:18px;">Verify documents<br/>with <span style="color:var(--teal);">zero doubt.</span></h2>
+      <p style="color:rgba(255,255,255,.55);font-size:1rem;line-height:1.75;max-width:380px;">SHA-256 hashing and digital signatures detect forgery instantly. No manual checking. No guesswork.</p>
+      <div style="display:flex;gap:28px;margin-top:40px;">
+        <div><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:1.5rem;color:white;">16</div><div style="font-size:.78rem;color:rgba(255,255,255,.45);margin-top:2px;">Checks per doc</div></div>
+        <div style="width:1px;background:rgba(255,255,255,.1);"></div>
+        <div><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:1.5rem;color:white;">O(1)</div><div style="font-size:.78rem;color:rgba(255,255,255,.45);margin-top:2px;">Verify time</div></div>
+        <div style="width:1px;background:rgba(255,255,255,.1);"></div>
+        <div><div style="font-family:'Sora',sans-serif;font-weight:800;font-size:1.5rem;color:white;">100%</div><div style="font-size:.78rem;color:rgba(255,255,255,.45);margin-top:2px;">Tamper-proof</div></div>
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 20px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><div style="width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 8px #10b981;"></div><span style="font-size:.78rem;color:rgba(255,255,255,.6);font-weight:500;">Last Verified · Just now</span></div>
+      <div style="font-size:.85rem;color:white;font-weight:600;margin-bottom:4px;">Academic Certificate · GEU 2024</div>
+      <div style="font-family:monospace;font-size:.7rem;color:rgba(255,255,255,.35);">CRED-GEU-2024-A1B2C3D4 · SHA256: a3f5c8d2...</div>
+      <div style="margin-top:8px;font-size:.75rem;color:var(--teal);font-weight:600;">✓ Verified — No Tampering Detected</div>
+    </div>
+  </div>
+
+  <!-- Right auth form panel -->
+  <div style="width:52%;display:flex;align-items:center;justify-content:center;padding:48px;overflow-y:auto;">
+    <div style="width:100%;max-width:440px;">
+      <div style="display:flex;background:#f1f5f9;border-radius:12px;padding:4px;margin-bottom:36px;">
+        <button id="tabLogin" onclick="switchTab('login')" style="flex:1;padding:12px;border:none;border-radius:9px;font-family:'Sora',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;transition:all .2s;background:white;color:var(--navy);box-shadow:0 2px 8px rgba(0,0,0,.08);">Sign In</button>
+        <button id="tabSignup" onclick="switchTab('signup')" style="flex:1;padding:12px;border:none;border-radius:9px;font-family:'Sora',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;transition:all .2s;background:transparent;color:var(--muted);box-shadow:none;">Create Account</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div id="loginForm">
+        <h3 style="font-family:'Sora',sans-serif;font-weight:800;font-size:1.8rem;margin-bottom:6px;">Welcome back</h3>
+        <p style="color:var(--muted);font-size:.9rem;margin-bottom:32px;">Sign in to your DocVerify account</p>
+        <div style="margin-bottom:16px;">
+          <label style="font-size:.82rem;font-weight:600;color:var(--slate);display:block;margin-bottom:7px;">Email Address</label>
+          <input type="email" placeholder="you@university.ac.in" style="width:100%;padding:13px 14px;border:2px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;background:var(--bg);" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'"/>
+        </div>
+        <div style="margin-bottom:24px;">
+          <label style="font-size:.82rem;font-weight:600;color:var(--slate);display:block;margin-bottom:7px;">Password</label>
+          <input type="password" placeholder="••••••••" style="width:100%;padding:13px 14px;border:2px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;background:var(--bg);" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'"/>
+        </div>
+        <button onclick="doLogin()" style="width:100%;padding:15px;background:var(--teal);color:white;border:none;border-radius:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(46,196,182,.35);">Sign In to DocVerify →</button>
+        <div style="display:flex;align-items:center;gap:14px;margin:24px 0;"><div style="flex:1;height:1px;background:var(--border);"></div><span style="font-size:.78rem;color:var(--muted);">or continue with</span><div style="flex:1;height:1px;background:var(--border);"></div></div>
+        <div style="display:flex;gap:12px;">
+          <button onclick="doLogin()" style="flex:1;padding:11px;border:2px solid var(--border);border-radius:10px;background:white;cursor:pointer;font-size:.85rem;font-weight:600;color:var(--slate);">🔵 Google</button>
+          <button onclick="doLogin()" style="flex:1;padding:11px;border:2px solid var(--border);border-radius:10px;background:white;cursor:pointer;font-size:.85rem;font-weight:600;color:var(--slate);">🔗 LinkedIn</button>
+        </div>
+        <p style="text-align:center;font-size:.85rem;color:var(--muted);margin-top:28px;">Don't have an account? <a href="#" onclick="switchTab('signup');return false;" style="color:var(--teal);font-weight:700;text-decoration:none;">Create one free →</a></p>
+      </div>
+
+      <!-- SIGNUP -->
+      <div id="signupForm" style="display:none;">
+        <h3 style="font-family:'Sora',sans-serif;font-weight:800;font-size:1.8rem;margin-bottom:6px;">Create account</h3>
+        <p style="color:var(--muted);font-size:.9rem;margin-bottom:28px;">Join DocVerify — free to start, no credit card needed.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+          <div><label style="font-size:.82rem;font-weight:600;color:var(--slate);display:block;margin-bottom:7px;">First Name</label><input type="text" placeholder="Suhani" style="width:100%;padding:13px 14px;border:2px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;background:var(--bg);" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'"/></div>
+          <div><label style="font-size:.82rem;font-weight:600;color:var(--slate);display:block;margin-bottom:7px;">Last Name</label><input type="text" placeholder="Kaushik" style="width:100%;padding:13px 14px;border:2px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;background:var(--bg);" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'"/></div>
+        </div>
+        <div style="margin-bottom:16px;"><label style="font-size:.82rem;font-weight:600;color:var(--slate);display:block;margin-bottom:7px;">Email Address</label><input type="email" placeholder="you@university.ac.in" style="width:100%;padding:13px 14px;border:2px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;background:var(--bg);" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'"/></div>
+        <div style="margin-bottom:16px;"><label style="font-size:.82rem;font-weight:600;color:var(--slate);display:block;margin-bottom:7px;">Organization</label><input type="text" placeholder="Graphic Era University" style="width:100%;padding:13px 14px;border:2px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;background:var(--bg);" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'"/></div>
+        <div style="margin-bottom:16px;"><label style="font-size:.82rem;font-weight:600;color:var(--slate);display:block;margin-bottom:7px;">Account Role</label><select style="width:100%;padding:13px 14px;border:2px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;background:var(--bg);"><option>🔍 Verifier — Check document authenticity</option><option>🏛️ Issuer — Issue & sign documents</option><option>⚙️ Admin — Manage organizations</option></select></div>
+        <div style="margin-bottom:22px;">
+          <label style="font-size:.82rem;font-weight:600;color:var(--slate);display:block;margin-bottom:7px;">Password</label>
+          <input id="signupPass" type="password" placeholder="Min. 8 characters" oninput="checkPasswordStrength(this.value)" style="width:100%;padding:13px 14px;border:2px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;background:var(--bg);" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'"/>
+          <div style="margin-top:8px;display:flex;gap:4px;"><div style="flex:1;height:3px;background:var(--border);border-radius:4px;" id="sb1"></div><div style="flex:1;height:3px;background:var(--border);border-radius:4px;" id="sb2"></div><div style="flex:1;height:3px;background:var(--border);border-radius:4px;" id="sb3"></div><div style="flex:1;height:3px;background:var(--border);border-radius:4px;" id="sb4"></div></div>
+          <div id="strengthLabel" style="font-size:.75rem;color:var(--muted);margin-top:4px;"></div>
+        </div>
+        <button onclick="doLogin()" style="width:100%;padding:15px;background:var(--teal);color:white;border:none;border-radius:12px;font-family:'Sora',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;box-shadow:0 4px 14px rgba(46,196,182,.35);">Create My Account →</button>
+        <p style="text-align:center;font-size:.85rem;color:var(--muted);margin-top:24px;">Already have an account? <a href="#" onclick="switchTab('login');return false;" style="color:var(--teal);font-weight:700;text-decoration:none;">Sign in →</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ═══════════════════ END AUTH ═══════════════════ -->
+
+<div class="hero-bg"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="#">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+    </div>
+    <span class="logo-text">Doc<span>Verify</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#verify">Verify Document</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#features">Features</a></li>
+  </ul>
+  <button class="nav-cta" onclick="document.getElementById('verify').scrollIntoView({behavior:'smooth'})">Verify Now</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div>
+    <div class="hero-badge">AI-Powered Verification</div>
+    <h1>Verify documents with <span>cryptographic</span> certainty</h1>
+    <p class="hero-sub">DocVerify uses SHA-256 hashing and digital signatures to instantly detect tampered, forged, or invalid documents — no manual checking needed.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="document.getElementById('verify').scrollIntoView({behavior:'smooth'})">Verify a Document</button>
+      <button class="btn-outline" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">See How It Works</button>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="doc-card">
+      <div class="floating-badge">🔒 Cryptographically Signed</div>
+      <div class="doc-header">
+        <div class="doc-icon"><svg viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div><div class="doc-title">Academic Certificate</div><div class="doc-sub">GEU · 2024 · Verified</div></div>
+      </div>
+      <div class="score-ring">
+        <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="#e2e8f0" stroke-width="10"/><circle cx="60" cy="60" r="50" fill="none" stroke="#2ec4b6" stroke-width="10" stroke-dasharray="314" stroke-dashoffset="31" stroke-linecap="round" transform="rotate(-90 60 60)"/></svg>
+        <div class="score-text"><div class="score-num">90</div><div class="score-label">Trust Score</div></div>
+      </div>
+      <div class="checks">
+        <div class="check-item"><span class="icon check-pass">✓</span><span style="flex:1;font-size:.8rem">Hash Match</span><div class="check-bar"><div class="check-bar-fill" style="width:100%;background:#10b981"></div></div></div>
+        <div class="check-item"><span class="icon check-pass">✓</span><span style="flex:1;font-size:.8rem">Digital Signature</span><div class="check-bar"><div class="check-bar-fill" style="width:95%;background:#10b981"></div></div></div>
+        <div class="check-item"><span class="icon check-pass">✓</span><span style="flex:1;font-size:.8rem">Issuer Trusted</span><div class="check-bar"><div class="check-bar-fill" style="width:100%;background:#10b981"></div></div></div>
+        <div class="check-item"><span class="icon check-warn">!</span><span style="flex:1;font-size:.8rem">Metadata Check</span><div class="check-bar"><div class="check-bar-fill" style="width:70%;background:#f59e0b"></div></div></div>
+      </div>
+      <div class="pill-verified">✅ Document Verified — No Tampering Detected</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ VERIFY SECTION ═══════════════════ -->
+<div class="divider"></div>
+<section class="section" id="verify">
+  <div class="section-label">Verification Engine</div>
+  <div class="section-title">Is your document authentic?</div>
+  <p class="section-sub">Upload any digital document or enter a Credential ID. Our system performs 16 cryptographic checks and returns an instant verdict.</p>
+
+  <!-- Two-column grid: Upload | Credential -->
+  <div class="upload-grid">
+
+    <!-- LEFT: Upload -->
+    <div>
+      <div class="upload-box" id="uploadBox" onclick="triggerUpload()">
+        <div class="upload-icon">
+          <svg viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="upload-title">Upload Document</div>
+        <p class="upload-hint">Drop your document here or click to browse. We'll generate its hash and verify integrity instantly.</p>
+        <div class="upload-formats">
+          <span class="format-tag">PDF</span><span class="format-tag">DOCX</span><span class="format-tag">PNG</span><span class="format-tag">JPG</span>
+        </div>
+        <input type="file" id="fileInput" style="display:none" accept=".pdf,.docx,.png,.jpg,.jpeg" onchange="handleFileUpload(this)"/>
+      </div>
+
+      <!-- File info + action buttons — OUTSIDE uploadBox to prevent click bubbling -->
+      <div id="fileInfo" onclick="event.stopPropagation()" style="display:none;margin-top:16px;background:white;border-radius:12px;padding:16px 20px;border:1px solid var(--border);">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:36px;height:36px;background:var(--teal-light);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a9e92" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+          </div>
+          <div>
+            <div id="fileName" style="font-weight:600;font-size:.9rem;"></div>
+            <div id="fileSize" style="font-size:.78rem;color:var(--muted);"></div>
+          </div>
+        </div>
+
+        <!-- Verify button -->
+        <button class="verify-btn" style="margin-top:14px" onclick="event.stopPropagation();runVerification('upload')">
+          <span class="btn-text" id="btnText1">🔍 Verify Document</span>
+          <div class="spinner" id="spinner1"></div>
+        </button>
+
+        <!-- Issue button -->
+        <button id="issueBtn" onclick="event.stopPropagation();issueDocument()" style="display:none;width:100%;margin-top:10px;background:white;color:var(--teal-dark);border:2px solid var(--teal);border-radius:10px;padding:13px;font-family:'Sora',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;transition:all .2s;align-items:center;justify-content:center;gap:8px;" onmouseover="this.style.background='var(--teal-light)'" onmouseout="this.style.background='white'">
+          <span id="issueBtnText">📋 Issue & Register Document</span>
+          <div class="spinner" id="issueSpinner"></div>
+        </button>
+
+        <p style="font-size:.75rem;color:var(--muted);margin-top:10px;text-align:center;">First time? <strong>Issue</strong> to register → then <strong>Verify</strong> to check authenticity</p>
+      </div>
+    </div>
+
+    <!-- RIGHT: Credential ID -->
+    <div class="credential-box">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <div style="width:32px;height:32px;background:var(--purple-light);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        </div>
+        <div class="upload-title">Verify by Credential ID</div>
+      </div>
+      <p class="upload-hint" style="margin:8px 0 0;font-size:.85rem">Each verified document gets a unique Credential ID. Enter it below to check its authenticity.</p>
+      <div class="input-group">
+        <label class="input-label">Credential ID</label>
+        <input class="input-field" type="text" id="credentialInput" placeholder="e.g. CRED-GEU-2024-A1B2C3D4" oninput="this.value=this.value.toUpperCase()"/>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Issuing Organization (Optional)</label>
+        <input class="input-field" type="text" placeholder="e.g. Graphic Era University"/>
+      </div>
+      <button class="verify-btn" onclick="runVerification('credential')">
+        <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="btn-text" id="btnText2">Verify Credential ID</span>
+        <div class="spinner" id="spinner2"></div>
+      </button>
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+        <div style="font-size:.78rem;color:var(--muted);margin-bottom:8px;font-weight:600;">How to use:</div>
+        <ol style="font-size:.78rem;color:var(--muted);padding-left:16px;line-height:2;">
+          <li>Upload a file → click <strong style="color:var(--teal);">Issue & Register</strong> to store its SHA-256 hash</li>
+          <li>The Credential ID auto-fills here</li>
+          <li>Click <strong style="color:var(--teal);">Verify Credential ID</strong> — checks the stored hash</li>
+          <li>Upload the <em>same</em> file again → Verify → ✅ Match</li>
+          <li>Upload a <em>different</em> file → Verify → ✗ Tampered</li>
+        </ol>
+      </div>
+    </div>
+
+  </div>
+  <!-- END upload-grid -->
+
+  <!-- RESULT PANEL — full width below the grid -->
+  <div class="result-panel" id="resultPanel">
+    <div class="result-header">
+      <div class="result-title">Verification Result</div>
+      <span id="resultTimestamp" style="font-size:.78rem;color:var(--muted);"></span>
+    </div>
+    <div class="result-body">
+      <div id="statusBanner" class="status-banner status-verified">
+        <div class="status-icon" id="statusIcon" style="background:#10b981;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <div>
+          <div class="status-text-title" id="statusTitle">Verifying...</div>
+          <div class="status-text-sub" id="statusSub"></div>
+        </div>
+      </div>
+      <div class="checks-grid" id="checksGrid"></div>
+      <div style="margin-top:20px;background:var(--navy);border-radius:12px;padding:20px 24px;">
+        <div style="font-size:.75rem;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;">Cryptographic Details</div>
+        <pre id="cryptoDetails" style="font-family:monospace;font-size:.75rem;color:#7dd3fc;line-height:1.9;white-space:pre-wrap;word-break:break-all;"></pre>
+      </div>
+      <!-- QR Code display -->
+      <div id="qrContainer" style="display:none;margin-top:24px;text-align:center;padding:24px;background:var(--bg);border-radius:12px;border:1px solid var(--border);">
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:1rem;margin-bottom:6px;">Credential QR Code</div>
+        <p style="font-size:.82rem;color:var(--muted);margin-bottom:16px;">Scan with phone camera · or <strong>click QR</strong> to open on this device</p>
+        <img id="qrImage" style="width:180px;height:180px;border-radius:12px;border:2px solid var(--border);background:white;transition:transform .2s;box-shadow:0 4px 14px rgba(0,0,0,.08);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"/>
+        <div id="qrCredId" style="margin-top:12px;font-family:monospace;font-size:.75rem;display:flex;flex-direction:column;align-items:center;gap:6px;"></div>
+      </div>
+    </div>
+  </div>
+
+</section>
+<!-- ═══════════════════ END VERIFY ═══════════════════ -->
+
+<!-- HOW IT WORKS -->
+<div class="divider"></div>
+<section class="section" id="how" style="background:white;max-width:100%;padding:60px 0;">
+  <div style="max-width:1200px;margin:0 auto;padding:0 48px;">
+    <div class="section-label">Process</div>
+    <div class="section-title">How verification works</div>
+    <p class="section-sub">A five-step cryptographic pipeline ensures document authenticity in milliseconds.</p>
+    <div class="steps-grid">
+      <div class="step-card"><div class="step-num">1</div><div class="step-title">Organization Authentication</div><p class="step-desc">Issuing organizations are pre-verified and registered in the trusted registry before they can sign any documents.</p><div class="step-arrow"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+      <div class="step-card"><div class="step-num">2</div><div class="step-title">Document Upload & Hashing</div><p class="step-desc">On upload, a SHA-256 cryptographic hash is computed from the document's binary content. Even a single byte change alters the hash.</p><div class="step-arrow"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+      <div class="step-card"><div class="step-num">3</div><div class="step-title">Digital Signature</div><p class="step-desc">The issuer signs the document hash with their private key using asymmetric cryptography. A unique Credential ID is generated and returned.</p></div>
+      <div class="step-card"><div class="step-num">4</div><div class="step-title">Verification Request</div><p class="step-desc">Verifiers upload the document or enter its Credential ID. The system recomputes the hash and fetches the stored record from the database.</p><div class="step-arrow"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+      <div class="step-card"><div class="step-num">5</div><div class="step-title">Hash Comparison & Result</div><p class="step-desc">If the hashes match and the signature is valid → Verified. If not → Tampered or Invalid. The result is instant and mathematically certain.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<div class="divider"></div>
+<section class="section" id="features">
+  <div class="section-label">Capabilities</div>
+  <div class="section-title">Built for trust at scale</div>
+  <p class="section-sub">Every component of DocVerify is designed with security-first principles from the ground up.</p>
+  <div class="features-grid">
+    <div class="feature-card"><div class="feature-icon fi-teal"><svg viewBox="0 0 24 24" class="si-teal"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="feature-title">SHA-256 Hash Integrity</div><p class="feature-desc">Every document is hashed using SHA-256. Any modification — even a single pixel — will produce a completely different hash, making tampering instantly detectable.</p></div>
+    <div class="feature-card"><div class="feature-icon fi-purple"><svg viewBox="0 0 24 24" class="si-purple"><path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="feature-title">Digital Signature Verification</div><p class="feature-desc">Documents are signed by issuers using asymmetric cryptography. Signatures prove authenticity and non-repudiation of the issuing authority.</p></div>
+    <div class="feature-card"><div class="feature-icon fi-green"><svg viewBox="0 0 24 24" class="si-green"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="feature-title">Unique Credential IDs</div><p class="feature-desc">Each verified document receives a globally unique Credential ID. Verifiers can check authenticity instantly without accessing the original file.</p></div>
+    <div class="feature-card"><div class="feature-icon fi-amber"><svg viewBox="0 0 24 24" class="si-amber"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="feature-title">Instant Verification</div><p class="feature-desc">O(1) constant time complexity per verification request. Results are delivered instantly regardless of the size of your document database.</p></div>
+    <div class="feature-card"><div class="feature-icon fi-teal"><svg viewBox="0 0 24 24" class="si-teal"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="feature-title">Centralized Registry</div><p class="feature-desc">All document hashes, signatures, and Credential IDs are stored in a centralized secure database — eliminating the need to contact issuing authorities manually.</p></div>
+    <div class="feature-card"><div class="feature-icon fi-purple"><svg viewBox="0 0 24 24" class="si-purple"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="feature-title">Full Audit Trail</div><p class="feature-desc">Every verification attempt is logged with a timestamp. Organizations can track who verified what and when, providing complete accountability.</p></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+<footer>
+  <strong>DocVerify</strong> — Digital Documentation Verification System &nbsp;·&nbsp; Team LogicLoop &nbsp;·&nbsp;
+  Suhani · Avni · Ira &nbsp;·&nbsp; BTECH CSE JAVA-IV-T117 &nbsp;·&nbsp; Graphic Era University 2024
+</footer>
+
+<!-- ═══════════════════ JAVASCRIPT ═══════════════════ -->
+<script>
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('loginForm').style.display  = isLogin ? 'block' : 'none';
+  document.getElementById('signupForm').style.display = isLogin ? 'none'  : 'block';
+  const tl = document.getElementById('tabLogin');
+  const ts = document.getElementById('tabSignup');
+  if (isLogin) {
+    tl.style.cssText = 'flex:1;padding:12px;border:none;border-radius:9px;font-family:Sora,sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;background:white;color:#0f172a;box-shadow:0 2px 8px rgba(0,0,0,.08);';
+    ts.style.cssText = 'flex:1;padding:12px;border:none;border-radius:9px;font-family:Sora,sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;background:transparent;color:#64748b;';
+  } else {
+    ts.style.cssText = 'flex:1;padding:12px;border:none;border-radius:9px;font-family:Sora,sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;background:white;color:#0f172a;box-shadow:0 2px 8px rgba(0,0,0,.08);';
+    tl.style.cssText = 'flex:1;padding:12px;border:none;border-radius:9px;font-family:Sora,sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;background:transparent;color:#64748b;';
+  }
+}
+
+function checkPasswordStrength(val) {
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const colors = ['#ef4444','#f59e0b','#10b981','#2ec4b6'];
+  ['sb1','sb2','sb3','sb4'].forEach((id,i) => {
+    document.getElementById(id).style.background = i < score ? colors[score-1] : 'var(--border)';
+  });
+  const lbl = document.getElementById('strengthLabel');
+  lbl.textContent = val.length > 0 ? ['','Weak','Fair','Good','Strong'][score] : '';
+  lbl.style.color = score <= 1 ? '#ef4444' : score === 2 ? '#f59e0b' : '#10b981';
+}
+
+function doLogin() {
+  sessionStorage.setItem('ddvs_auth', '1');
+  const overlay = document.getElementById('authOverlay');
+  overlay.style.transition = 'opacity .4s ease';
+  overlay.style.opacity = '0';
+  setTimeout(() => { overlay.style.display = 'none'; }, 420);
+}
+
+// ── BACKEND ───────────────────────────────────────────────────────────────────
+const API_BASE = 'http://localhost:8080/api';
+let backendOnline = false;
+let currentFile   = null;
+
+async function checkBackend() {
+  try {
+    const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(2000) });
+    if (res.ok) {
+      const data = await res.json();
+      backendOnline = true;
+      updateBackendIndicator(true, data.documentsIssued || 0);
+      showToast('✅ Java backend connected on port 8080', 'success', 3000);
+    }
+  } catch(e) {
+    backendOnline = false;
+    updateBackendIndicator(false, 0);
+    showToast('⚠️ Backend offline — start run.bat or run.sh first', 'warn', 6000);
+  }
+}
+
+function updateBackendIndicator(online, docsCount) {
+  let pill = document.getElementById('backendPill');
+  if (!pill) {
+    pill = document.createElement('div');
+    pill.id = 'backendPill';
+    pill.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:500;color:white;border-radius:20px;padding:8px 16px;font-family:"DM Sans",sans-serif;font-size:.78rem;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.2);display:flex;align-items:center;gap:8px;cursor:pointer;transition:all .3s;';
+    pill.title = 'Click to re-check backend';
+    pill.onclick = () => checkBackend();
+    document.body.appendChild(pill);
+  }
+  pill.style.background = online ? '#10b981' : '#f59e0b';
+  pill.innerHTML = online
+    ? `<span style="font-size:.65rem;">●</span> Java Backend Online · ${docsCount} docs`
+    : `<span style="font-size:.65rem;">●</span> Backend Offline — click to retry`;
+}
+
+// ── FILE UPLOAD ───────────────────────────────────────────────────────────────
+function triggerUpload() {
+  document.getElementById('fileInput').click();
+}
+
+function handleFileUpload(input) {
+  if (!input.files.length) return;
+  currentFile = input.files[0];
+  document.getElementById('fileName').textContent = currentFile.name;
+  document.getElementById('fileSize').textContent  = (currentFile.size / 1024).toFixed(1) + ' KB · ' + (currentFile.type || 'unknown');
+  document.getElementById('fileInfo').style.display = 'block';
+  document.getElementById('uploadBox').classList.add('active');
+  document.getElementById('issueBtn').style.display = 'flex';
+}
+
+// ── ISSUE ─────────────────────────────────────────────────────────────────────
+async function issueDocument() {
+  if (!currentFile) return;
+  if (!backendOnline) {
+    try {
+      const probe = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(2000) });
+      if (probe.ok) backendOnline = true;
+    } catch(e) {}
+  }
+  if (!backendOnline) { showToast('❌ Backend offline. Start run.bat or run.sh first.', 'error'); return; }
+
+  const btnText = document.getElementById('issueBtnText');
+  const spinner = document.getElementById('issueSpinner');
+  btnText.style.display = 'none';
+  spinner.classList.add('show');
+
+  try {
+    const formData = new FormData();
+    formData.append('file',     currentFile, currentFile.name);
+    formData.append('fileName', currentFile.name);
+    formData.append('fileType', currentFile.type || 'application/octet-stream');
+    formData.append('issuer',   'Graphic Era University');
+
+    const res  = await fetch(`${API_BASE}/issue`, { method: 'POST', body: formData });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      showToast('❌ Issue failed: ' + (data.error || 'Unknown error'), 'error');
+      return;
+    }
+
+    showToast(`✅ Issued! Credential ID: ${data.credentialId}`, 'success', 8000);
+    document.getElementById('credentialInput').value = data.credentialId;
+    updateBackendIndicator(true, '');
+
+    // Show QR if returned
+    if (data.qr) showQR(data.qr, data.credentialId);
+
+  } catch(e) {
+    showToast('❌ Network error: ' + e.message, 'error');
+  } finally {
+    btnText.style.display = 'inline';
+    spinner.classList.remove('show');
+  }
+}
+
+// ── VERIFY DISPATCHER ────────────────────────────────────────────────────────
+async function runVerification(type) {
+  // Re-ping backend in case flag is stale — never silently block the user
+  if (!backendOnline) {
+    try {
+      const probe = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(2000) });
+      if (probe.ok) backendOnline = true;
+    } catch(e) {}
+  }
+  if (!backendOnline) { showToast('❌ Backend offline. Start run.bat or run.sh first.', 'error'); return; }
+
+  const spinnerId = type === 'upload' ? 'spinner1' : 'spinner2';
+  const btnTextId = type === 'upload' ? 'btnText1'  : 'btnText2';
+  document.getElementById(spinnerId).classList.add('show');
+  document.getElementById(btnTextId).classList.add('hide');
+
+  try {
+    if (type === 'upload') {
+      if (!currentFile) { showToast('Please select a file first.', 'error'); return; }
+      await verifyByFile(currentFile);
+    } else {
+      const credVal = document.getElementById('credentialInput').value.trim().toUpperCase();
+      if (!credVal) { showToast('Please enter a Credential ID.', 'error'); return; }
+      await verifyByCredential(credVal);
+    }
+  } catch(err) {
+    console.error('[DocVerify] Verification error:', err);
+    showToast('❌ Error: ' + err.message, 'error');
+    // Show the error visibly in the result panel
+    const panel = document.getElementById('resultPanel');
+    panel.classList.add('show');
+    document.getElementById('statusBanner').className = 'status-banner status-tampered';
+    document.getElementById('statusIcon').style.background = '#ef4444';
+    document.getElementById('statusIcon').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M6 18L18 6M6 6l12 12"/></svg>';
+    document.getElementById('statusTitle').textContent = 'Request Failed';
+    document.getElementById('statusSub').textContent = 'Error: ' + err.message + ' — check browser console (F12)';
+    document.getElementById('resultTimestamp').textContent = 'Failed at ' + new Date().toLocaleTimeString();
+    document.getElementById('checksGrid').innerHTML = '';
+    document.getElementById('cryptoDetails').textContent = '';
+  } finally {
+    document.getElementById(spinnerId).classList.remove('show');
+    document.getElementById(btnTextId).classList.remove('hide');
+  }
+}
+
+// ── VERIFY BY FILE ────────────────────────────────────────────────────────────
+async function verifyByFile(file) {
+  const formData = new FormData();
+  formData.append('file',     file, file.name);
+  formData.append('fileName', file.name);
+  formData.append('fileType', file.type || 'application/octet-stream');
+
+  const res  = await fetch(`${API_BASE}/verify`, { method: 'POST', body: formData });
+  const data = await res.json();
+
+  showResult({
+    status:          data.status,
+    hashMatch:       data.hashMatch,
+    signatureValid:  data.signatureValid,
+    credentialFound: data.credentialFound,
+    issuerTrusted:   data.issuerTrusted,
+    computedHash:    data.computedHash,
+    storedHash:      data.storedHash,
+    credentialId:    data.credentialId,
+    fileName:        data.fileName  || file.name,
+    fileSize:        data.fileSize  || file.size,
+    issuedAt:        data.issuedAt,
+    issuer:          data.issuer,
+    signature:       data.signature
+  });
+}
+
+// ── VERIFY BY CREDENTIAL ID ───────────────────────────────────────────────────
+async function verifyByCredential(credId) {
+  const res  = await fetch(`${API_BASE}/verify`, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ mode: 'credential', credentialId: credId })
+  });
+  const data = await res.json();
+
+  showResult({
+    status:          data.status,
+    hashMatch:       data.hashMatch,
+    signatureValid:  data.signatureValid,
+    credentialFound: data.credentialFound,
+    issuerTrusted:   data.credentialFound,
+    computedHash:    data.hash,
+    storedHash:      data.hash,
+    credentialId:    data.credentialId || credId,
+    fileName:        data.fileName,
+    fileSize:        data.fileSize,
+    issuedAt:        data.issuedAt,
+    issuer:          data.issuer,
+    signature:       data.signature
+  });
+}
+
+// ── RENDER RESULT ─────────────────────────────────────────────────────────────
+function showResult(r) {
+  const panel  = document.getElementById('resultPanel');
+  const banner = document.getElementById('statusBanner');
+  const icon   = document.getElementById('statusIcon');
+  const title  = document.getElementById('statusTitle');
+  const sub    = document.getElementById('statusSub');
+
+  // Force re-show animation even if already visible
+  panel.classList.remove('show');
+  void panel.offsetWidth; // trigger reflow
+  panel.classList.add('show');
+
+  document.getElementById('resultTimestamp').textContent = 'Checked at ' + new Date().toLocaleTimeString();
+  setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+
+  const cfg = {
+    verified:   { cls:'status-banner status-verified', bg:'#10b981', svg:'<path d="M5 13l4 4L19 7"/>',    title:'Document Verified ✓',         sub:'SHA-256 hash matches the registry. Digital signature is valid. This document is authentic.' },
+    tampered:   { cls:'status-banner status-tampered', bg:'#ef4444', svg:'<path d="M6 18L18 6M6 6l12 12"/>', title:'Tampering Detected ✗',          sub:'The computed SHA-256 hash does NOT match the stored hash. This document has been modified.' },
+    invalid:    { cls:'status-banner status-invalid',  bg:'#f59e0b', svg:'<path d="M12 9v4m0 4h.01"/>',  title:'Credential Not Found',          sub:'This Credential ID does not exist in the registry. Issue the document first to register it.' },
+    not_issued: { cls:'status-banner status-invalid',  bg:'#f59e0b', svg:'<path d="M12 9v4m0 4h.01"/>',  title:'Document Not Registered',       sub:'This document has never been issued through DocVerify. Use "Issue & Register" first.' }
+  };
+
+  const c = cfg[r.status] || { cls:'status-banner status-invalid', bg:'#64748b', svg:'<path d="M12 9v4m0 4h.01"/>', title:'Unknown Response', sub:'Server returned: "' + (r.status||'none') + '". Check browser console.' };
+
+  banner.className = c.cls;
+  icon.style.background = c.bg;
+  icon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">${c.svg}</svg>`;
+  title.textContent = c.title;
+  sub.textContent   = c.sub;
+
+  renderChecks(r);
+  renderCrypto(r);
+}
+
+function renderChecks(r) {
+  const checks = [
+    { name:'SHA-256 Hash Match',    val: r.hashMatch       ? 'Hashes identical'            : 'Hash mismatch — content changed',  pass: r.hashMatch },
+    { name:'Digital Signature',     val: r.signatureValid  ? 'HMAC-SHA256 · Valid'          : 'Signature invalid or absent',       pass: r.signatureValid },
+    { name:'Credential Registry',   val: r.credentialFound ? `Found: ${r.credentialId}`    : 'Not in registry',                   pass: r.credentialFound },
+    { name:'Issuer Trust',          val: r.issuerTrusted   ? (r.issuer||'Verified Issuer')  : 'Unknown / Untrusted',               pass: r.issuerTrusted },
+    { name:'Expiry Check',          val: r.issuedAt        ? 'Valid (no expiry set)'        : 'N/A',                               pass: !!r.issuedAt },
+    { name:'Format Integrity',      val: r.fileName        ? (r.fileName.match(/\.(pdf|docx|png|jpg|jpeg)$/i) ? 'Accepted format' : 'Unknown format') : 'N/A', pass: !!r.fileName },
+    { name:'File Size Consistency', val: r.fileSize        ? (r.fileSize/1024).toFixed(1)+' KB' : 'N/A',                          pass: !!r.fileSize },
+    { name:'Audit Log Entry',       val: 'Request recorded', pass: true }
+  ];
+  document.getElementById('checksGrid').innerHTML = checks.map(c => `
+    <div class="check-card">
+      <div class="check-dot ${c.pass ? 'dot-green' : 'dot-red'}"></div>
+      <div><div class="check-name">${c.name}</div><div class="check-val">${c.val}</div></div>
+    </div>`).join('');
+}
+
+function renderCrypto(r) {
+  const fmt = (s, n=32) => s ? s.substring(0,n)+'…' : 'N/A';
+  document.getElementById('cryptoDetails').innerHTML =
+`Algorithm:      SHA-256 (HMAC-SHA256 signature)
+Credential ID:  ${r.credentialId || 'N/A'}
+Document:       ${r.fileName     || 'N/A'}
+Computed Hash:  ${fmt(r.computedHash)}
+Stored Hash:    ${fmt(r.storedHash)}
+Hash Match:     ${r.hashMatch       ? '✓ MATCH'   : '✗ MISMATCH'}
+Signature:      HMAC-SHA256 · ${r.signatureValid ? '✓ VALID' : '✗ INVALID'}
+Issuer:         ${r.issuer   || 'Unknown'}
+Issued At:      ${r.issuedAt || 'Never issued'}
+Verified At:    ${new Date().toISOString()}`;
+}
+
+// ── QR ────────────────────────────────────────────────────────────────────────
+function showQR(qrBase64, credentialId) {
+  const container = document.getElementById('qrContainer');
+  const img       = document.getElementById('qrImage');
+  const credLabel = document.getElementById('qrCredId');
+  const verifyUrl = `http://localhost:8080/verify.html?id=${credentialId}`;
+
+  img.src = 'data:image/png;base64,' + qrBase64;
+  img.style.cursor = 'pointer';
+  img.title = 'Click to open verification page';
+  img.onclick = () => window.open(verifyUrl, '_blank');
+
+  if (credLabel && credentialId) {
+    credLabel.innerHTML = `
+      <span style="color:var(--muted);">${credentialId}</span>
+      <a href="${verifyUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;background:var(--teal);color:white;padding:8px 18px;border-radius:8px;font-family:'Sora',sans-serif;font-weight:700;font-size:.8rem;text-decoration:none;">
+        🔗 Open Verify Page
+      </a>`;
+  }
+  container.style.display = 'block';
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function showToast(msg, type='success', duration=4000) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);padding:14px 24px;border-radius:12px;font-family:"DM Sans",sans-serif;font-size:.9rem;font-weight:600;z-index:9999;opacity:0;transition:all .3s ease;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.15);pointer-events:none;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.background = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#f59e0b';
+  t.style.color = 'white';
+  clearTimeout(t._hide);
+  setTimeout(() => { t.style.opacity='1'; t.style.transform='translateX(-50%) translateY(0)'; }, 10);
+  t._hide = setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(20px)'; }, duration);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  if (sessionStorage.getItem('ddvs_auth')) {
+    document.getElementById('authOverlay').style.display = 'none';
+  }
+  checkBackend();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "DocVerify Backend",
+      "request": "launch",
+      "mainClass": "com.ddvs.Main",
+      "projectName": "ddvs",
+      "classPaths": ["${workspaceFolder}/backend/out"],
+      "preLaunchTask": "compile-ddvs"
+    }
+  ]
+}
